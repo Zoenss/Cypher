@@ -34,6 +34,15 @@ class TechAPITests(unittest.TestCase):
         self.assertTrue(resultado["encontrado"])
         self.assertFalse(resultado["verificado"])
         self.assertEqual(resultado["peso"], 200)
+        ficha.assert_called_once_with("samsung", "2025/galaxy-a16/samsung-galaxy-a16.json")
+
+    @patch("services.techapi_service.requests.get")
+    def test_caminho_publico_inclui_marca(self, get):
+        from services.techapi_service import _ficha
+
+        get.return_value.json.return_value = {"name": "Samsung Galaxy S25"}
+        _ficha("samsung", "2025/galaxy-s25/ficha.json")
+        self.assertIn("/smartphone/samsung/2025/galaxy-s25/ficha.json", get.call_args.args[0])
 
 
 if __name__ == "__main__":
