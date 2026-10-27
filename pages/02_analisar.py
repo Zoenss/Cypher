@@ -367,6 +367,7 @@ if not isinstance(erros_fontes, list):
 
 mobile_info = resultado_hibrido.get("mobileapi")
 techapi_info = resultado_hibrido.get("techapi")
+wikidata_info = resultado_hibrido.get("wikidata")
 icecat_info = resultado_hibrido.get("icecat")
 catalogo_info = resultado_hibrido.get("catalogo_local")
 
@@ -476,6 +477,13 @@ if isinstance(techapi_info, dict) and techapi_info.get("encontrado"):
            else "Ficha comunitária não verificada; confira os dados antes de usar.")
     )
     st.caption("Fonte: Data from TechAPI (CC-BY-SA 4.0). As estimativas de materiais são do Cypher.")
+
+if isinstance(wikidata_info, dict) and wikidata_info.get("encontrado"):
+    st.info(
+        f"🔎 Wikidata confirmou a identificação: {wikidata_info.get('modelo', 'modelo não informado')} "
+        f"({wikidata_info.get('identificador', '')}). A fonte não confirmou peso nem ficha técnica completa."
+    )
+    st.caption("Dados de identificação: Wikidata (CC0). Composição e valor: estimativas do Cypher.")
 
 
 # ==================================================
