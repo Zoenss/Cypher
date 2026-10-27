@@ -73,9 +73,9 @@ def _listar_fichas(marca: str) -> list[str]:
 
 
 @st.cache_data(ttl=86400, show_spinner=False)
-def _ficha(caminho: str) -> dict[str, Any]:
+def _ficha(marca: str, caminho: str) -> dict[str, Any]:
     resposta = requests.get(
-        f"{RAW_BASE}/data/smartphone/{caminho}",
+        f"{RAW_BASE}/data/smartphone/{marca}/{caminho}",
         headers={"User-Agent": "Cypher-TCC/1.0"}, timeout=15,
     )
     resposta.raise_for_status()
@@ -108,7 +108,7 @@ def buscar_techapi(nome: str) -> dict[str, Any]:
         pontuacao, caminho = max(candidatos)
         if pontuacao < 0.72:
             return {"encontrado": False, "fonte": "TechAPI"}
-        dados = _ficha(caminho)
+        dados = _ficha(marca, caminho)
         if _marca(str(dados.get("name", ""))) != marca:
             return {"encontrado": False, "fonte": "TechAPI"}
         return {
