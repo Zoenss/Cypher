@@ -13,7 +13,7 @@ from services.hybrid_product_service import resolver_produto_hibrido
 
 
 st.set_page_config(
-    page_title="Chipper - Análise",
+    page_title="Cypher - Análise",
     page_icon="⚙️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -326,8 +326,8 @@ if resultado_hibrido is None:
     resultado_hibrido = {
         "encontrado": False,
         "categoria_final": "desconhecido",
-        "fonte_principal": "Motor interno do CHIPPER",
-        "fontes_utilizadas": ["Motor interno do CHIPPER"],
+        "fonte_principal": "Motor interno do CYPHER",
+        "fontes_utilizadas": ["Motor interno do CYPHER"],
         "catalogo_local": None,
         "mobileapi": None,
         "icecat": None,
@@ -345,7 +345,7 @@ categoria_analise = str(
 origem_categoria = str(
     resultado_hibrido.get(
         "fonte_principal",
-        "Motor interno do CHIPPER",
+        "Motor interno do CYPHER",
     )
 )
 
@@ -404,7 +404,7 @@ except ValueError as erro:
 fontes_texto = ", ".join(
     str(fonte)
     for fonte in fontes_utilizadas
-) or "Motor interno do CHIPPER"
+) or "Motor interno do CYPHER"
 
 if erro_hibrido:
     st.markdown(
@@ -413,7 +413,7 @@ if erro_hibrido:
         '<div class="source-error">Sistema híbrido com falha parcial</div>'
         f'<div class="small-text">{escape(erro_hibrido)}</div>'
         '<div class="small-text">'
-        'A análise foi mantida pelo motor interno do CHIPPER.'
+        'A análise foi mantida pelo motor interno do CYPHER.'
         '</div>'
         '</div>',
         unsafe_allow_html=True,
@@ -428,7 +428,7 @@ elif dados_mobile or dados_icecat or (isinstance(techapi_info, dict) and techapi
         '<div class="small-text">'
         'A ficha técnica externa complementa a identificação. '
         'Componentes, materiais, massas e recomendações continuam '
-        'sendo estimados pelo motor CHIPPER.'
+        'sendo estimados pelo motor CYPHER.'
         '</div>'
         '</div>',
         unsafe_allow_html=True,
@@ -453,7 +453,7 @@ else:
     st.markdown(
         '<div class="card">'
         '<div class="card-title">ORIGEM DOS DADOS</div>'
-        '<div class="source-warning">Análise interna do CHIPPER</div>'
+        '<div class="source-warning">Análise interna do CYPHER</div>'
         f'<div class="small-text">Fontes utilizadas: {escape(fontes_texto)}.</div>'
         '<div class="small-text">'
         'Nenhuma ficha técnica externa foi localizada, '
@@ -697,7 +697,7 @@ elif dados_icecat:
 
     with c3:
         st.markdown(
-            '<div class="card"><div class="card-title">CATEGORIA CHIPPER</div>'
+            '<div class="card"><div class="card-title">CATEGORIA CYPHER</div>'
             f'<div class="technical-value">{escape(categoria_exibicao)}</div>'
             '</div>',
             unsafe_allow_html=True,
@@ -1090,7 +1090,7 @@ st.markdown(
 st.caption(
     "Ficha técnica: MobileAPI, Icecat ou catálogo local, quando disponíveis. "
     "Componentes, materiais, massas, recomendações e valor econômico: "
-    "estimativas calculadas pelo motor CHIPPER."
+    "estimativas calculadas pelo motor CYPHER."
 )
 
 col_voltar, col_descartar, col_exportar = st.columns(3)
