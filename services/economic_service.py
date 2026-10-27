@@ -130,7 +130,7 @@ ALIASES_MATERIAIS: dict[str, str] = {
 def normalizar_material(material: str) -> str:
     """
     Normaliza o nome recebido para o padrão utilizado
-    internamente pelo CHIPPER.
+    internamente pelo CYPHER.
     """
 
     if not material:
@@ -358,7 +358,7 @@ def calcular_valor_economico(
 
         "fonte_precos": (
             "Tabela interna de preços de referência "
-            "do CHIPPER"
+            "do CYPHER"
         ),
 
         "observacao": (
