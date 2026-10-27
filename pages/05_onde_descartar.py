@@ -10,7 +10,7 @@ from services.reverse_logistics_service import (
 
 
 st.set_page_config(
-    page_title="Chipper - Onde descartar",
+    page_title="Cypher - Onde descartar",
     page_icon="📍",
     layout="wide",
     initial_sidebar_state="collapsed",
