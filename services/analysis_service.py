@@ -385,7 +385,7 @@ def estimar_analise(
         "recomendacoes": gerar_recomendacoes(categoria_normalizada),
         "observacao": (
             "Os resultados apresentados são estimativas calculadas "
-            "pelo CHIPPER com base na categoria e na massa informada. "
+            "pelo CYPHER com base na categoria e na massa informada. "
             "Eles não representam desmontagem física, medição "
             "individual dos componentes ou análise laboratorial."
         ),
