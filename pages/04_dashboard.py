@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from kpis import calcular_kpis
+from services.kpis import calcular_kpis
 
 st.set_page_config(page_title="Chipper Recycling", layout="wide")
 
@@ -62,7 +62,8 @@ try:
     if arquivo:
         df = pd.read_csv(arquivo)
     else:
-        df = pd.read_csv("data_sample.csv")
+        st.info("Envie um CSV de operações para visualizar os indicadores do dashboard.")
+        st.stop()
 
     if "data" in df.columns:
         df["data"] = pd.to_datetime(df["data"], errors="coerce")
