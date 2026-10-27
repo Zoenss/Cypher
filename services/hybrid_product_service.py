@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Any
 
 from services.api_service import (
@@ -31,6 +32,33 @@ def _pontuacao_match(valor: Any) -> float:
         return float(texto)
     except (TypeError, ValueError):
         return -1.0
+
+
+def _tokens_modelo(texto: str) -> list[str]:
+    normal = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().lower()
+    return re.findall(r"[a-z0-9]+", normal)
+
+
+def _modelo_compativel(consulta: str, dispositivo: dict[str, Any]) -> bool:
+    """Exige a mesma referência de modelo/variante, não apenas similaridade textual."""
+    nome = str(dispositivo.get("name") or "")
+    if not nome:
+        return False
+    buscados = set(_tokens_modelo(consulta))
+    retornados = set(_tokens_modelo(nome))
+    codigos = lambda ts: {t for t in ts if re.search(r"\d", t) and t not in {"4g", "5g", "3g"}}
+    codigos_consulta = codigos(buscados)
+    codigos_resposta = codigos(retornados)
+    if not codigos_consulta or not codigos_consulta.issubset(codigos_resposta):
+        return False
+    variantes = {"ultra", "plus", "pro", "max", "mini", "lite", "fe", "edge"}
+    if (buscados & variantes) != (retornados & variantes):
+        return False
+    marcas = {"samsung", "apple", "motorola", "xiaomi", "google", "oneplus", "sony", "nokia", "honor", "huawei"}
+    marca_retorno = set(_tokens_modelo(str(dispositivo.get("manufacturer_name") or dispositivo.get("brand") or "")))
+    if (buscados & marcas) and not ((buscados & marcas) & (retornados | marca_retorno)):
+        return False
+    return True
 
 
 def _normalizar_dados_mobile(dados: dict[str, Any]) -> dict[str, Any]:
@@ -71,6 +99,7 @@ def _mobile_precisa_detalhes(dados: dict[str, Any]) -> bool:
 
 def _resumo_mobile(
     consulta: dict[str, Any] | None,
+    nome_consultado: str,
 ) -> dict[str, Any] | None:
     if not consulta or not consulta.get("encontrado"):
         return None
@@ -83,8 +112,12 @@ def _resumo_mobile(
     if not isinstance(dispositivos, list) or not dispositivos:
         return None
 
+    compativeis = [item for item in dispositivos if isinstance(item, dict) and _modelo_compativel(nome_consultado, item)]
+    if not compativeis:
+        return None
+
     melhor = max(
-        dispositivos,
+        compativeis,
         key=lambda item: _pontuacao_match(
             item.get("match_certainty") if isinstance(item, dict) else None
         ),
@@ -229,7 +262,12 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
     if deve_tentar_mobile:
         try:
             consulta_mobile = buscar_dispositivo(nome)
-            resumo_mobile = _resumo_mobile(consulta_mobile)
+            resumo_mobile = _resumo_mobile(consulta_mobile, nome)
+
+            if consulta_mobile and consulta_mobile.get("encontrado") and not resumo_mobile:
+                resultado["erros"].append(
+                    "MobileAPI: nenhum resultado corresponde ao modelo exato informado; variantes diferentes foram ignoradas."
+                )
 
             if resumo_mobile:
                 dados_mobile = resumo_mobile.get("dados", {})
