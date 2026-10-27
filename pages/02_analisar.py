@@ -366,6 +366,7 @@ if not isinstance(erros_fontes, list):
     erros_fontes = []
 
 mobile_info = resultado_hibrido.get("mobileapi")
+techapi_info = resultado_hibrido.get("techapi")
 icecat_info = resultado_hibrido.get("icecat")
 catalogo_info = resultado_hibrido.get("catalogo_local")
 
@@ -418,7 +419,7 @@ if erro_hibrido:
         unsafe_allow_html=True,
     )
 
-elif dados_mobile or dados_icecat:
+elif dados_mobile or dados_icecat or (isinstance(techapi_info, dict) and techapi_info.get("encontrado")):
     st.markdown(
         '<div class="card">'
         '<div class="card-title">ORIGEM DOS DADOS</div>'
@@ -466,6 +467,15 @@ if erros_fontes:
     with st.expander("Detalhes das fontes externas"):
         for erro in erros_fontes:
             st.caption(str(erro))
+
+if isinstance(techapi_info, dict) and techapi_info.get("encontrado"):
+    st.info(
+        f"📱 TechAPI identificou: {techapi_info.get('modelo', 'modelo não informado')}. "
+        f"Peso informado na fonte: {techapi_info.get('peso') or 'indisponível'} g. "
+        + ("Ficha verificada na fonte." if techapi_info.get("verificado")
+           else "Ficha comunitária não verificada; confira os dados antes de usar.")
+    )
+    st.caption("Fonte: Data from TechAPI (CC-BY-SA 4.0). As estimativas de materiais são do Cypher.")
 
 
 # ==================================================
