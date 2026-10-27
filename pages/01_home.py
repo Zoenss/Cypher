@@ -5,7 +5,7 @@ from services.tales_service import gemini_disponivel, responder
 
 
 st.set_page_config(
-    page_title="Chipper",
+    page_title="Cypher",
     page_icon="♻️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -295,7 +295,7 @@ st.markdown(
 # =========================
 st.markdown(
     '<div class="hero">'
-    '<div class="logo" translate="no">CHIPPER</div>'
+    '<div class="logo" translate="no">CYPHER</div>'
     '<div class="subtitle">'
     'REVERSE LOGISTICS INTELLIGENCE'
     '</div>'
@@ -484,7 +484,7 @@ if st.session_state[
         'Clique em '
         '<strong>INICIAR ANÁLISE</strong>.<br><br>'
 
-        'O CHIPPER irá identificar o equipamento, '
+        'O CYPHER irá identificar o equipamento, '
         'consultar as fontes disponíveis e estimar '
         'componentes, materiais recuperáveis, '
         'potencial de recuperação e valor econômico.'
@@ -536,7 +536,7 @@ if st.session_state[
 # =========================
 st.markdown(
     '<div class="footer">'
-    'CHIPPER CORE • MATERIAL INTELLIGENCE • Chipper International • 2026 • '
+    'CYPHER CORE • MATERIAL INTELLIGENCE • Cypher • 2026 • '
     'REVERSE LOGISTICS'
     '</div>',
     unsafe_allow_html=True,
