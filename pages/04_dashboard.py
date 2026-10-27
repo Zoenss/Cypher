@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from services.kpis import calcular_kpis
 
-st.set_page_config(page_title="Chipper Recycling", layout="wide")
+st.set_page_config(page_title="Cypher Recycling", layout="wide")
 
 # =========================
 # ESTILO
@@ -18,7 +18,7 @@ h2 { color: #22c55e; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("♻️ Chipper Recycling - Inteligência de Resíduos")
+st.title("♻️ Cypher Recycling - Inteligência de Resíduos")
 
 # =========================
 # VALORES PADRÃO (BASE)
