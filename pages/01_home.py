@@ -1,6 +1,7 @@
 from textwrap import dedent
 
 import streamlit as st
+from services.tales_service import gemini_disponivel, responder
 
 
 st.set_page_config(
@@ -462,7 +463,7 @@ if st.session_state[
         '</div>'
 
         '<div class="tales-subtitle">'
-        'ASSISTENTE CHIPPER'
+        'SEU GUIA NO CYPHER'
         '</div>'
 
         '<div class="tales-text">'
@@ -499,6 +500,35 @@ if st.session_state[
         '</div>',
         unsafe_allow_html=True,
     )
+
+    st.caption("💜 O Tales explica o Cypher e orienta sua jornada. Ele não inventa resultados técnicos.")
+    if "tales_conversa" not in st.session_state:
+        st.session_state["tales_conversa"] = []
+    if "tales_gemini_chamadas" not in st.session_state:
+        st.session_state["tales_gemini_chamadas"] = 0
+
+    for papel, texto in st.session_state["tales_conversa"][-8:]:
+        with st.chat_message(papel, avatar="🟣" if papel == "assistant" else "👤"):
+            st.write(texto)
+
+    usar_ia = False
+    if gemini_disponivel():
+        usar_ia = st.checkbox(
+            "Experimentar Gemini (cota gratuita configurada)",
+            value=False,
+            help="O proprietário precisa manter a chave em projeto sem faturamento habilitado.",
+        )
+    pergunta_tales = st.text_input("Pergunte ao Tales", max_chars=500,
+                                  placeholder="Como funciona a análise?", key="tales_pergunta")
+    if st.button("Perguntar ao Tales", key="tales_enviar") and pergunta_tales.strip():
+        usar_gemini_agora = usar_ia and st.session_state["tales_gemini_chamadas"] < 3
+        resposta, fonte = responder(pergunta_tales, usar_gemini=usar_gemini_agora)
+        if fonte == "gemini":
+            st.session_state["tales_gemini_chamadas"] += 1
+        st.session_state["tales_conversa"].extend([
+            ("user", pergunta_tales), ("assistant", resposta),
+        ])
+        st.rerun()
 
 
 # =========================
