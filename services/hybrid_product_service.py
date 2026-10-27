@@ -16,6 +16,7 @@ from services.product_api_service import (
     buscar_produto_por_marca_codigo,
 )
 from services.upc_service import UPCItemDBError, buscar_produto_por_nome as buscar_upc_por_nome
+from services.techapi_service import TechAPIError, buscar_techapi
 
 
 def _categoria_mobile(categoria: str) -> bool:
@@ -203,6 +204,7 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
         "fonte_principal": "Motor interno do CHIPPER",
         "catalogo_local": produto_local,
         "mobileapi": None,
+        "techapi": None,
         "icecat": None,
         "upcitemdb": None,
         "consulta_icecat": None,
@@ -268,6 +270,23 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
             resultado["erros"].append(
                 "MobileAPI: " f"{type(erro).__name__}"
             )
+
+    # Plano B gratuito para celulares e tablets, somente se a MobileAPI falhar.
+    if deve_tentar_mobile and resultado["mobileapi"] is None:
+        try:
+            alternativa = buscar_techapi(nome)
+            resultado["techapi"] = alternativa
+            if alternativa.get("encontrado"):
+                resultado["fontes_utilizadas"].append("TechAPI")
+                resultado["encontrado"] = True
+                resultado["fonte_principal"] = "TechAPI"
+                resultado["categoria_final"] = "phone"
+                if not alternativa.get("verificado"):
+                    resultado["erros"].append(
+                        "TechAPI: ficha comunitária ainda não verificada; confira o modelo."
+                    )
+        except TechAPIError as erro:
+            resultado["erros"].append(f"TechAPI: {erro}")
 
     icecat_consultado = False
     if produto_local:
