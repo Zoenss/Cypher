@@ -201,7 +201,7 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
         "nome_informado": nome,
         "categoria_interna": categoria_interna,
         "categoria_final": categoria_interna,
-        "fonte_principal": "Motor interno do CHIPPER",
+        "fonte_principal": "Motor interno do CYPHER",
         "catalogo_local": produto_local,
         "mobileapi": None,
         "techapi": None,
@@ -396,7 +396,7 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
             )
 
     if not resultado["fontes_utilizadas"]:
-        resultado["fontes_utilizadas"].append("Motor interno do CHIPPER")
+        resultado["fontes_utilizadas"].append("Motor interno do CYPHER")
 
     if resultado.get("categoria_final") in {None, ""}:
         resultado["categoria_final"] = "desconhecido"
