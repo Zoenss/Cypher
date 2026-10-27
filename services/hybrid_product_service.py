@@ -18,6 +18,7 @@ from services.product_api_service import (
 )
 from services.upc_service import UPCItemDBError, buscar_produto_por_nome as buscar_upc_por_nome
 from services.techapi_service import TechAPIError, buscar_techapi
+from services.wikidata_service import WikidataError, buscar_modelo_wikidata
 
 
 def _categoria_mobile(categoria: str) -> bool:
@@ -238,6 +239,7 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
         "catalogo_local": produto_local,
         "mobileapi": None,
         "techapi": None,
+        "wikidata": None,
         "icecat": None,
         "upcitemdb": None,
         "consulta_icecat": None,
@@ -325,6 +327,23 @@ def resolver_produto_hibrido(nome_produto: str) -> dict[str, Any]:
                     )
         except TechAPIError as erro:
             resultado["erros"].append(f"TechAPI: {erro}")
+
+    # Última fonte de identificação sem custo: não fornece ficha técnica completa.
+    if deve_tentar_mobile and resultado["mobileapi"] is None and not (
+        isinstance(resultado["techapi"], dict) and resultado["techapi"].get("encontrado")
+    ):
+        try:
+            alternativa_wikidata = buscar_modelo_wikidata(nome)
+            resultado["wikidata"] = alternativa_wikidata
+            if alternativa_wikidata.get("encontrado"):
+                resultado["fontes_utilizadas"].append("Wikidata")
+                resultado["encontrado"] = True
+                resultado["fonte_principal"] = "Wikidata"
+                resultado["erros"].append(
+                    "Wikidata: identidade encontrada; massa e ficha técnica não foram confirmadas nessa fonte."
+                )
+        except WikidataError as erro:
+            resultado["erros"].append(f"Wikidata: {erro}")
 
     icecat_consultado = False
     if produto_local:
