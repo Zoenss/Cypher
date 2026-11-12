@@ -328,7 +328,8 @@ def estimar_analise(
     categoria: str | None,
     massa_g: float,
 ) -> dict[str, Any]:
-    if massa_g <= 0:
+    import math
+    if not math.isfinite(massa_g) or massa_g <= 0:
         raise ValueError("A massa deve ser maior que zero.")
 
     categoria_normalizada = normalizar_categoria(categoria)
@@ -386,6 +387,8 @@ def estimar_analise(
         "observacao": (
             "Os resultados apresentados são estimativas calculadas "
             "pelo CYPHER com base na categoria e na massa informada. "
+            "A massa recuperável é um limite teórico, não um rendimento real: "
+            "assume recuperação integral dos materiais classificados, sem perdas. "
             "Eles não representam desmontagem física, medição "
             "individual dos componentes ou análise laboratorial."
         ),

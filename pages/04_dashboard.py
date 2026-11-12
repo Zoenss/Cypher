@@ -76,7 +76,11 @@ try:
     df["destino"] = df["destino"].astype(str).str.strip().str.lower()
     df["ponto_coleta"] = df["ponto_coleta"].astype(str).str.strip()
 
-    df["massa_kg"] = pd.to_numeric(df["massa_kg"], errors="coerce").fillna(0)
+    df["massa_kg"] = pd.to_numeric(df["massa_kg"], errors="coerce")
+    if df["massa_kg"].isna().any():
+        raise ValueError("Há massas ausentes ou inválidas no CSV. Corrija os registros antes de continuar.")
+    if (df["massa_kg"] < 0).any():
+        raise ValueError("Há massas negativas no CSV. Corrija os registros antes de continuar.")
 
 except Exception as e:
     st.error(f"Erro ao carregar dados: {e}")

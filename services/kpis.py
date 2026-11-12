@@ -26,13 +26,16 @@ def validar_df(df: pd.DataFrame) -> None:
     if faltando:
         raise ValueError(f"CSV faltando colunas: {sorted(faltando)}")
 
+    if not pd.api.types.is_numeric_dtype(df["massa_kg"]):
+        raise ValueError("A coluna massa_kg deve conter números válidos.")
+
     if df["massa_kg"].isna().any():
         raise ValueError("A coluna 'massa_kg' contém valores vazios.")
 
     if (df["massa_kg"] < 0).any():
         raise ValueError("A coluna 'massa_kg' não pode ter valores negativos.")
 
-    destinos_invalidos = set(df["destino"].dropna().unique()) - DESTINOS_VALIDOS
+    destinos_invalidos = set(df["destino"].dropna().astype(str).str.strip().str.lower().unique()) - DESTINOS_VALIDOS
     if destinos_invalidos:
         raise ValueError(f"Destino(s) inválido(s): {sorted(destinos_invalidos)}")
 
