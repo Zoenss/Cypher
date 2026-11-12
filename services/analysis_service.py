@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+import re
 
 
 PERFIS: dict[str, dict[str, Any]] = {
@@ -257,6 +258,10 @@ PALAVRAS_CATEGORIA: dict[str, list[str]] = {
 
 def identificar_categoria_por_nome(nome: str) -> str:
     nome_normalizado = nome.strip().lower()
+    # Samsung Galaxy S/A/M/Z com número: modelos de smartphones.
+    # Não classificar genericamente toda a marca Samsung como celular.
+    if re.search(r"\bsamsung\s+(?:galaxy\s+)?[samz]\d{1,3}(?:\b|[a-z])", nome_normalizado):
+        return "phone"
 
     for categoria, palavras in PALAVRAS_CATEGORIA.items():
         if any(palavra in nome_normalizado for palavra in palavras):
