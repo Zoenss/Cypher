@@ -8,6 +8,7 @@ from services.economic_service import (
     calcular_valor_economico,
     formatar_real,
 )
+from services.recovery_scenario_service import simular_recuperacao
 from services.export_service import gerar_csv_analise
 from services.hybrid_product_service import resolver_produto_hibrido
 
@@ -964,6 +965,75 @@ st.markdown(
     '</div>',
     unsafe_allow_html=True,
 )
+
+# ==================================================
+# SIMULADOR OPCIONAL DE RECUPERAÇÃO
+# ==================================================
+st.markdown(
+    '<div class="section-title">Simulador de recuperação</div>',
+    unsafe_allow_html=True,
+)
+st.caption(
+    "Cenário hipotético: informe a eficiência de recuperação por material. "
+    "Os percentuais não são medições industriais e começam em zero."
+)
+if not materiais:
+    st.info("Não há materiais estimados para esta categoria. Confira a identificação do equipamento antes de simular.")
+else:
+    with st.expander("Configurar cenário de recuperação", expanded=False):
+        rendimentos = {}
+        for indice, item in enumerate(materiais):
+            nome_material = str(item.get("material", "Material desconhecido"))
+            rendimentos[nome_material] = st.slider(
+                f"{nome_material} — rendimento (%)",
+                min_value=0,
+                max_value=100,
+                value=0,
+                step=5,
+                key=f"cenario_recuperacao_{indice}",
+            ) / 100.0
+        custo_cenario = st.number_input(
+            "Custo estimado de processamento do lote (R$)",
+            min_value=0.0,
+            value=0.0,
+            step=1.0,
+            key="cenario_custo_processamento",
+        )
+        try:
+            cenario = simular_recuperacao(
+                materiais, rendimentos, custo_cenario
+            )
+        except (ValueError, TypeError, OverflowError) as erro:
+            st.error(f"Não foi possível calcular o cenário: {erro}")
+        else:
+            col_massa, col_bruto, col_saldo = st.columns(3)
+            col_massa.metric(
+                "Massa recuperada estimada",
+                f'{cenario["massa_recuperada_estimada_g"]:.2f} g',
+            )
+            col_bruto.metric(
+                "Valor bruto potencial",
+                formatar_real(cenario["valor_bruto_potencial_rs"]),
+            )
+            col_saldo.metric(
+                "Saldo hipotético após custo",
+                formatar_real(cenario["saldo_hipotetico_rs"]),
+            )
+            st.dataframe(
+                [
+                    {
+                        "Material": item["material"],
+                        "Rendimento hipotético (%)": item["rendimento_hipotetico_pct"],
+                        "Massa recuperada (g)": item["massa_recuperada_estimada_g"],
+                        "Valor bruto potencial (R$)": item["valor_bruto_potencial_rs"],
+                    }
+                    for item in cenario["materiais"]
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+            st.caption(cenario["observacao"])
+
 
 # ==================================================
 # VALOR ECONÔMICO ESTIMADO
