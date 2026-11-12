@@ -977,6 +977,28 @@ st.caption(
     "Cenário hipotético: informe a eficiência de recuperação por material. "
     "Os percentuais não são medições industriais e começam em zero."
 )
+# Mantém os valores fora das chaves dos widgets, que o Streamlit remove
+# quando o usuário navega para outra página.
+assinatura_cenario = (nome_aparelho, massa_total, quantidade)
+if st.session_state.get("cenario_assinatura") != assinatura_cenario:
+    st.session_state["cenario_assinatura"] = assinatura_cenario
+    st.session_state["cenario_valores"] = {}
+    st.session_state["cenario_custo_salvo"] = 0.0
+
+
+def _restaurar_valor(chave: str, padrao: float | int) -> None:
+    if chave not in st.session_state:
+        st.session_state[chave] = st.session_state.get("cenario_valores", {}).get(chave, padrao)
+
+
+def _salvar_rendimento(chave: str) -> None:
+    st.session_state.setdefault("cenario_valores", {})[chave] = st.session_state[chave]
+
+
+def _salvar_custo() -> None:
+    st.session_state["cenario_custo_salvo"] = st.session_state["cenario_custo_processamento"]
+
+
 if not materiais:
     st.info("Não há materiais estimados para esta categoria. Confira a identificação do equipamento antes de simular.")
 else:
@@ -984,20 +1006,26 @@ else:
         rendimentos = {}
         for indice, item in enumerate(materiais):
             nome_material = str(item.get("material", "Material desconhecido"))
+            chave_rendimento = f"cenario_recuperacao_{indice}"
+            _restaurar_valor(chave_rendimento, 0)
             rendimentos[nome_material] = st.slider(
                 f"{nome_material} — rendimento (%)",
                 min_value=0,
                 max_value=100,
                 value=0,
                 step=5,
-                key=f"cenario_recuperacao_{indice}",
+                key=chave_rendimento,
+                on_change=_salvar_rendimento,
+                args=(chave_rendimento,),
             ) / 100.0
+        _restaurar_valor("cenario_custo_processamento", st.session_state.get("cenario_custo_salvo", 0.0))
         custo_cenario = st.number_input(
             "Custo estimado de processamento do lote (R$)",
             min_value=0.0,
             value=0.0,
             step=1.0,
             key="cenario_custo_processamento",
+            on_change=_salvar_custo,
         )
         try:
             cenario = simular_recuperacao(
