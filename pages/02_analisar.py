@@ -977,7 +977,9 @@ st.caption(
     "Cenário hipotético: informe a eficiência de recuperação por material. "
     "Os percentuais não são medições industriais e começam em zero."
 )
-if materiais:
+if not materiais:
+    st.info("Não há materiais estimados para esta categoria. Confira a identificação do equipamento antes de simular.")
+else:
     with st.expander("Configurar cenário de recuperação", expanded=False):
         rendimentos = {}
         for indice, item in enumerate(materiais):
