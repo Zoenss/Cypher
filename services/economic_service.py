@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+import math
 
 
 # ============================================================
@@ -189,7 +190,7 @@ def calcular_valor_material(
 
     if massa < 0:
         raise ValueError(
-            "A massa do material não pode ser negativa."
+            "A massa do material deve ser finita e não negativa."
         )
 
     material_normalizado = normalizar_material(

@@ -977,6 +977,7 @@ st.caption(
     "Cenário hipotético: informe a eficiência de recuperação por material. "
     "Os percentuais não são medições industriais e começam em zero."
 )
+cenario_exportacao = None
 if not materiais:
     st.info("Não há materiais estimados para esta categoria. Confira a identificação do equipamento antes de simular.")
 else:
@@ -1006,6 +1007,7 @@ else:
         except (ValueError, TypeError, OverflowError) as erro:
             st.error(f"Não foi possível calcular o cenário: {erro}")
         else:
+            cenario_exportacao = cenario
             col_massa, col_bruto, col_saldo = st.columns(3)
             col_massa.metric(
                 "Massa recuperada estimada",
@@ -1199,6 +1201,7 @@ with col_exportar:
         percentual_recuperavel=percentual_recuperavel,
         valor_total_estimado=valor_total,
         recomendacoes=recomendacoes,
+        cenario_recuperacao=cenario_exportacao,
     )
 
     nome_arquivo = (

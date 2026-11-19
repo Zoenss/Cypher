@@ -20,6 +20,7 @@ def gerar_csv_analise(
     percentual_recuperavel: float,
     valor_total_estimado: float,
     recomendacoes: list[str],
+    cenario_recuperacao: dict[str, Any] | None = None,
 ) -> bytes:
     """Gera o CSV da análise atual do CHIPPER em formato amigável ao Excel."""
 
@@ -42,6 +43,11 @@ def gerar_csv_analise(
         "percentual_recuperavel",
         "valor_total_estimado_rs",
         "recomendacoes_logistica_reversa",
+        "rendimento_hipotetico_pct",
+        "massa_recuperada_estimada_g",
+        "valor_bruto_potencial_material_rs",
+        "custo_processamento_cenario_rs",
+        "saldo_hipotetico_cenario_rs",
     ]
 
     escritor = csv.DictWriter(
@@ -82,8 +88,14 @@ def gerar_csv_analise(
             }
         ]
 
+    detalhes_cenario = {
+        str(item["material"]): item
+        for item in (cenario_recuperacao or {}).get("materiais", [])
+    }
+
     for item in linhas_economicas:
         material = str(item.get("material", "Não informado"))
+        detalhe_cenario = detalhes_cenario.get(material, {})
 
         escritor.writerow(
             {
@@ -121,6 +133,11 @@ def gerar_csv_analise(
                     2,
                 ),
                 "recomendacoes_logistica_reversa": recomendacoes_texto,
+                "rendimento_hipotetico_pct": detalhe_cenario.get("rendimento_hipotetico_pct", ""),
+                "massa_recuperada_estimada_g": detalhe_cenario.get("massa_recuperada_estimada_g", ""),
+                "valor_bruto_potencial_material_rs": detalhe_cenario.get("valor_bruto_potencial_rs", ""),
+                "custo_processamento_cenario_rs": (cenario_recuperacao or {}).get("custos_processamento_rs", ""),
+                "saldo_hipotetico_cenario_rs": (cenario_recuperacao or {}).get("saldo_hipotetico_rs", ""),
             }
         )
 
